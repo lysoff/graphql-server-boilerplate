@@ -1,0 +1,20 @@
+{
+   "name": "graphql-server-boilerplate",
+   "version": "0.0.1",
+   "description": "Awesome project developed with TypeORM.",
+   "devDependencies": {
+      "@types/node": "^12.7.2",
+      "nodemon": "^1.19.1",
+      "ts-node": "8.3.0",
+      "typescript": "3.5.3"
+   },
+   "dependencies": {
+      "graphql-yoga": "^1.18.2",
+      "pg": "^7.12.1",
+      "reflect-metadata": "^0.1.13",
+      "typeorm": "0.2.18"
+   },
+   "scripts": {
+      "start": "nodemon --exec ts-node src/index.ts"
+   }
+}
