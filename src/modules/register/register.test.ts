@@ -31,49 +31,48 @@ beforeAll(async () => {
   host = `http://127.0.0.1:${port}`;
 });
 
-test("Register mutation", async () => {
-  // if register successful
-  const response1 = await request(host, mutation(email, password));
-  expect(response1).toEqual({ register: null });
+describe("Register mutation", () => {
+  test("check if register works", async () => {
+    // if register successful
+    const response1 = await request(host, mutation(email, password));
+    expect(response1).toEqual({ register: null });
 
-  const users = await User.find({ where: { email } });
-  expect(users[0].email).toEqual(email);
-  expect(users[0].password).not.toEqual(password);
-
-  // trying to register with the same email
-  const response2 = await request(host, mutation(email, password));
-  expect(response2).toEqual({
-    register: [
-      {
-        path: "email",
-        message: emailAlreadyTaken
-      }
-    ]
+    const users = await User.find({ where: { email } });
+    expect(users[0].email).toEqual(email);
+    expect(users[0].password).not.toEqual(password);
   });
 
-  // trying to register invalid data
-  const response3 = await request(host, mutation("r", "d"));
-  expect(response3).toEqual({
-    register: [
-      {
-        path: "email",
-        message: emailIsTooShort
-      },
-      {
-        path: "email",
-        message: invalidEmail
-      },
-      {
-        path: "password",
-        message: passwordIsTooShort
-      }
-    ]
+  test("check duplicate email", async () => {
+    // trying to register with the same email
+    const response2 = await request(host, mutation(email, password));
+    expect(response2).toEqual({
+      register: [
+        {
+          path: "email",
+          message: emailAlreadyTaken
+        }
+      ]
+    });
+  })
+
+  test("check invalid data", async () => {
+    // trying to register invalid data
+    const response3 = await request(host, mutation("r", "d"));
+    expect(response3).toEqual({
+      register: [
+        {
+          path: "email",
+          message: emailIsTooShort
+        },
+        {
+          path: "email",
+          message: invalidEmail
+        },
+        {
+          path: "password",
+          message: passwordIsTooShort
+        }
+      ]
+    });
   });
 });
-
-afterAll(async () => {
-  if (app) {
-    await app.close();
-    console.log('Server down');
-  }
-})
