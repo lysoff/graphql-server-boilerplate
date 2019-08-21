@@ -1,0 +1,6 @@
+export const emailAlreadyTaken = "Email already taken"
+export const emailIsTooShort = "Email is too short"
+export const emailIsTooLong = "Email is too long"
+export const invalidEmail = "Email is invalid"
+export const passwordIsTooShort = "Email is too short"
+export const passwordIsTooLong = "Email is too long"
