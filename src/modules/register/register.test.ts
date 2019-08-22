@@ -7,7 +7,7 @@ import {
   emailIsTooShort,
   invalidEmail,
   passwordIsTooShort
-} from "../../errors";
+} from "./errors";
 import { createOrmConnection } from '../../connection';
 
 const email = "bob@bob.com";

@@ -9,7 +9,7 @@ import {
   invalidEmail,
   passwordIsTooShort,
   passwordIsTooLong
-} from "../../errors";
+} from "./errors";
 import * as yup from "yup";
 import { createConfirmLink } from "../../utils/createConfirmLink";
 import { sendEmail } from "../../utils/sendEmail";
