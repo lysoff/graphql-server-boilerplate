@@ -52,8 +52,10 @@ const resolvers: IResolvers = {
       const user = User.create({ email, password: hashedPassword });
       await user.save();
 
-      const link = await createConfirmLink(request.headers.host, user.id, redis)
-      await sendEmail(user.email, link);
+      if (process.env.NODE_ENV !== "test") {
+        const link = await createConfirmLink(request.headers.host, user.id, redis)
+        await sendEmail(user.email, link);
+      }
 
       return null;
     }
