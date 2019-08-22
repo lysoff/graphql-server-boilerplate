@@ -12,6 +12,7 @@ import {
 } from "../../errors";
 import * as yup from "yup";
 import { createConfirmLink } from "../../utils/createConfirmLink";
+import { sendEmail } from "../../utils/sendEmail";
 
 const validationSchema = yup.object().shape({
   email: yup
@@ -51,7 +52,8 @@ const resolvers: IResolvers = {
       const user = User.create({ email, password: hashedPassword });
       await user.save();
 
-      await createConfirmLink(request.headers.host, user.id, redis)
+      const link = await createConfirmLink(request.headers.host, user.id, redis)
+      await sendEmail(user.email, link);
 
       return null;
     }
