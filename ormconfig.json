@@ -33,7 +33,8 @@
       "password": "",
       "database": "graphql_server_boilerplate_test",
       "synchronize": true,
-      "logging": true,
+      "logging": false,
+      "dropSchema": true,
       "entities": [
          "src/entity/**/*.ts"
       ],

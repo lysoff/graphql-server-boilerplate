@@ -1,14 +1,14 @@
 import { request } from 'graphql-request';
 import { User } from '../../entity/User';
-import { startServer } from "../../startServer";
-import { AddressInfo } from "net";
-import { Server } from 'http';
+
+
 import {
   emailAlreadyTaken,
   emailIsTooShort,
   invalidEmail,
   passwordIsTooShort
 } from "../../errors";
+import { createOrmConnection } from '../../connection';
 
 const email = "bob@bob.com";
 const password = "123456";
@@ -22,19 +22,14 @@ mutation {
 }
 `;
 
-let app: Server | null = null;
-let host = '';
-
 beforeAll(async () => {
-  app = await startServer();
-  const { port } = app.address() as AddressInfo;
-  host = `http://127.0.0.1:${port}`;
-});
+  await createOrmConnection();
+})
 
 describe("Register mutation", () => {
   test("check if register works", async () => {
     // if register successful
-    const response1 = await request(host, mutation(email, password));
+    const response1 = await request(process.env.TEST_HOST as string, mutation(email, password));
     expect(response1).toEqual({ register: null });
 
     const users = await User.find({ where: { email } });
@@ -44,7 +39,7 @@ describe("Register mutation", () => {
 
   test("check duplicate email", async () => {
     // trying to register with the same email
-    const response2 = await request(host, mutation(email, password));
+    const response2 = await request(process.env.TEST_HOST as string, mutation(email, password));
     expect(response2).toEqual({
       register: [
         {
@@ -57,7 +52,7 @@ describe("Register mutation", () => {
 
   test("check invalid data", async () => {
     // trying to register invalid data
-    const response3 = await request(host, mutation("r", "d"));
+    const response3 = await request(process.env.TEST_HOST as string, mutation("r", "d"));
     expect(response3).toEqual({
       register: [
         {

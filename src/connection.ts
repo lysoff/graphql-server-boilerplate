@@ -1,7 +1,19 @@
-import { getConnectionOptions, createConnection } from 'typeorm';
+import { getConnectionOptions, createConnection, Connection } from 'typeorm';
 
-export const getOrmConnection = async () => {
+export const createOrmConnection = async () => {
+  let connection: Connection;
+
+  // try {
+  //   connection = getConnection(process.env.NODE_ENV);
+  //   return connection;
+  // } catch (err) {
+  //   console.log(err);
+  // }
+
   const connectionOptions = await getConnectionOptions(process.env.NODE_ENV);
-  const connection = await createConnection({ ...connectionOptions, name: "default" });
+  console.log("-----------------------------");
+  console.log("CONOPTIONS", connectionOptions);
+  console.log("-----------------------------");
+  connection = await createConnection({ ...connectionOptions, name: "default" });
   return connection;
 };

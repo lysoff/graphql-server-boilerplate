@@ -11,6 +11,7 @@ import {
   passwordIsTooLong
 } from "../../errors";
 import * as yup from "yup";
+import { createConfirmLink } from "../../utils/createConfirmLink";
 
 const validationSchema = yup.object().shape({
   email: yup
@@ -24,13 +25,12 @@ const validationSchema = yup.object().shape({
     .max(255, passwordIsTooLong)
 })
 
-
 const resolvers: IResolvers = {
   Query: {
     bye: () => ''
   },
   Mutation: {
-    register: async (_: any, args: GQL.IRegisterOnMutationArguments) => {
+    register: async (_: any, args: GQL.IRegisterOnMutationArguments, { redis, request }) => {
       try {
         await validationSchema.validate(args, { abortEarly: false })
       } catch (err) {
@@ -49,7 +49,10 @@ const resolvers: IResolvers = {
 
       const hashedPassword = await bcrypt.hash(password, 10);
       const user = User.create({ email, password: hashedPassword });
-      user.save();
+      await user.save();
+
+      await createConfirmLink(request.headers.host, user.id, redis)
+
       return null;
     }
   }
