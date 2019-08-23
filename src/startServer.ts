@@ -3,6 +3,8 @@ import { createOrmConnection } from './connection'
 import { redis } from './redis';
 import { createSchema } from './createSchema';
 import { confirmEmail } from "./routes/confirmEmail";
+import session from 'express-session';
+import connectRedis from 'connect-redis';
 
 export const startServer = async () => {
   await createOrmConnection(process.env.NODE_ENV === "test");
@@ -15,7 +17,18 @@ export const startServer = async () => {
       redis,
       host: `${request.protocol}://${request.get('host')}`
     })
-  })
+  });
+
+  const RedisStore = connectRedis(session)
+
+  server.express.use(session({
+    store: new RedisStore({
+      client: redis as any
+    }),
+    resave: false,
+    saveUninitialized: false,
+    secret: 'supersecret'
+  }))
 
   server.express.get("/confirm/:id", confirmEmail);
 

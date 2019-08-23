@@ -11,7 +11,7 @@ const resolvers: IResolvers = {
     bye2: () => ''
   },
   Mutation: {
-    login: async (_: any, { email, password }: GQL.ILoginOnMutationArguments) => {
+    login: async (_: any, { email, password }: GQL.ILoginOnMutationArguments, { request }) => {
       const user = await User.findOne({ email });
 
       if (!user) {
@@ -36,6 +36,8 @@ const resolvers: IResolvers = {
           message: invalidLoginError
         }]
       }
+
+      request.session.userId = user.id;
 
       return null;
     }

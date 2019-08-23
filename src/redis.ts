@@ -1,6 +1,3 @@
-import { Redis } from "ioredis";
+import RedisClient, { Redis } from "ioredis";
 
-// tslint:disable-next-line
-const Redis = require("ioredis");
-
-export const redis: Redis = new Redis();
+export const redis: Redis = new RedisClient();

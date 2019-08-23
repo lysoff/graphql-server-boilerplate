@@ -14,7 +14,7 @@
     "sourceMap": true,
     "outDir": "./dist",
     "moduleResolution": "node",
-    "allowSyntheticDefaultImports": false,
+    "allowSyntheticDefaultImports": true,
     "emitDecoratorMetadata": true,
     "esModuleInterop": true,
     "experimentalDecorators": true,
