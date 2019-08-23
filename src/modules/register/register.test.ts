@@ -1,7 +1,6 @@
 import { request } from 'graphql-request';
 import { User } from '../../entity/User';
 
-
 import {
   emailAlreadyTaken,
   emailIsTooShort,
@@ -9,6 +8,7 @@ import {
   passwordIsTooShort
 } from "./errors";
 import { createOrmConnection } from '../../connection';
+import { getConnection } from 'typeorm';
 
 const email = "bob@bob.com";
 const password = "123456";
@@ -22,9 +22,14 @@ mutation {
 }
 `;
 
+
 beforeAll(async () => {
   await createOrmConnection();
-})
+});
+
+afterAll(async () => {
+  await getConnection().close();
+});
 
 describe("Register mutation", () => {
   test("check if register works", async () => {

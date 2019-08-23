@@ -2,6 +2,7 @@ import { createOrmConnection } from "../../connection";
 import { request } from "graphql-request";
 import { invalidLoginError, emailNotConfirmedError } from "./errors";
 import { User } from "../../entity/User";
+import { getConnection } from "typeorm";
 
 const email = "bob@bob.com";
 const password = "123456";
@@ -28,12 +29,16 @@ beforeAll(async () => {
   await createOrmConnection();
 });
 
+afterAll(async () => {
+  getConnection().close();
+});
 
 describe("Login test", () => {
   test("Check for bad login", async () => {
+
     const response = await request(
       process.env.TEST_HOST as string,
-      loginMutation("bob@bob.com", "whatever")
+      loginMutation("bor@bob.com", "whatever")
     );
 
     expect(response).toEqual({

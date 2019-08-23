@@ -1,6 +1,5 @@
 import SparkPost = require('sparkpost');
-const client = new SparkPost("dasdadasdas");
-console.log('Come here' + process.env.SPARKPOST_API_KEY);
+const client = new SparkPost(process.env.SPARKHOST_API_KEY);
 
 export const sendEmail = async (recepient: string, url: string) => {
 

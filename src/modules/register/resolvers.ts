@@ -49,7 +49,10 @@ const resolvers: IResolvers = {
       }
 
       const hashedPassword = await bcrypt.hash(password, 10);
-      const user = User.create({ email, password: hashedPassword });
+      const user = User.create({
+        email,
+        password: hashedPassword
+      });
       await user.save();
 
       if (process.env.NODE_ENV !== "test") {
