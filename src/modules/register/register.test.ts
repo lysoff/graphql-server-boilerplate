@@ -1,5 +1,5 @@
-import { request } from 'graphql-request';
 import { User } from '../../entity/User';
+import { RequestManager } from "../../utils/RequestManager";
 
 import {
   emailAlreadyTaken,
@@ -13,16 +13,6 @@ import { getConnection } from 'typeorm';
 const email = "bob@bob.com";
 const password = "123456";
 
-const mutation = (e: string, p: string) => `
-mutation {
-  register(email: "${e}", password: "${p}") {
-    path
-    message
-  }
-}
-`;
-
-
 beforeAll(async () => {
   await createOrmConnection();
 });
@@ -33,9 +23,10 @@ afterAll(async () => {
 
 describe("Register mutation", () => {
   test("check if register works", async () => {
+    const requestManager = new RequestManager(process.env.TEST_HOST as string);
     // if register successful
-    const response1 = await request(process.env.TEST_HOST as string, mutation(email, password));
-    expect(response1).toEqual({ register: null });
+    const response1 = await requestManager.register(email, password)
+    expect(response1.data).toEqual({ register: null });
 
     const users = await User.find({ where: { email } });
     expect(users[0].email).toEqual(email);
@@ -43,9 +34,10 @@ describe("Register mutation", () => {
   });
 
   test("check duplicate email", async () => {
+    const requestManager = new RequestManager(process.env.TEST_HOST as string);
     // trying to register with the same email
-    const response2 = await request(process.env.TEST_HOST as string, mutation(email, password));
-    expect(response2).toEqual({
+    const response2 = await requestManager.register(email, password)
+    expect(response2.data).toEqual({
       register: [
         {
           path: "email",
@@ -56,9 +48,10 @@ describe("Register mutation", () => {
   })
 
   test("check invalid data", async () => {
+    const requestManager = new RequestManager(process.env.TEST_HOST as string);
     // trying to register invalid data
-    const response3 = await request(process.env.TEST_HOST as string, mutation("r", "d"));
-    expect(response3).toEqual({
+    const response3 = await requestManager.register("d", "sd")
+    expect(response3.data).toEqual({
       register: [
         {
           path: "email",

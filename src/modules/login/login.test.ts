@@ -1,29 +1,11 @@
 import { createOrmConnection } from "../../connection";
-import { request } from "graphql-request";
 import { invalidLoginError, emailNotConfirmedError } from "./errors";
 import { User } from "../../entity/User";
 import { getConnection } from "typeorm";
+import { RequestManager } from "../../utils/RequestManager";
 
 const email = "bob@bob.com";
 const password = "123456";
-
-const registerMutation = (e: string, p: string) => `
-mutation {
-  register(email: "${e}", password: "${p}") {
-    path
-    message
-  }
-}
-`;
-
-const loginMutation = (e: string, p: string) => `
-mutation {
-  login(email: "${e}", password: "${p}") {
-    path
-    message
-  }
-}
-`;
 
 beforeAll(async () => {
   await createOrmConnection();
@@ -35,30 +17,21 @@ afterAll(async () => {
 
 describe("Login test", () => {
   test("Check for bad login", async () => {
+    const requestManager = new RequestManager(process.env.TEST_HOST as string)
+    const response = await requestManager.login("bor@bob.com", "whatever");
 
-    const response = await request(
-      process.env.TEST_HOST as string,
-      loginMutation("bor@bob.com", "whatever")
-    );
-
-    expect(response).toEqual({
+    expect(response.data).toEqual({
       login: [{
         path: "email",
         message: invalidLoginError
       }]
     });
 
-    await request(
-      process.env.TEST_HOST as string,
-      registerMutation(email, password)
-    );
+    await requestManager.register(email, password)
 
-    const response1 = await request(
-      process.env.TEST_HOST as string,
-      loginMutation(email, password)
-    );
+    const response1 = await requestManager.login(email, password)
 
-    expect(response1).toEqual({
+    expect(response1.data).toEqual({
       login: [{
         path: "email",
         message: emailNotConfirmedError
@@ -67,24 +40,18 @@ describe("Login test", () => {
 
     await User.update({ email }, { confirmed: true });
 
-    const response2 = await request(
-      process.env.TEST_HOST as string,
-      loginMutation(email, "wrong password")
-    );
+    const response2 = await requestManager.login(email, "wrong pass")
 
-    expect(response2).toEqual({
+    expect(response2.data).toEqual({
       login: [{
         path: "email",
         message: invalidLoginError
       }]
     });
 
-    const response3 = await request(
-      process.env.TEST_HOST as string,
-      loginMutation(email, password)
-    );
+    const response3 = await requestManager.login(email, password)
 
-    expect(response3).toEqual({
+    expect(response3.data).toEqual({
       login: null
     });
   })

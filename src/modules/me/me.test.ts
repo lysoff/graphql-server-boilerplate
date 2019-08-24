@@ -1,28 +1,10 @@
-import axios from "axios";
 import { createOrmConnection } from "../../connection";
 import { getConnection } from "typeorm";
 import { User } from "../../entity/User";
+import { RequestManager } from "../../utils/RequestManager";
 
 const email = "bob6@bob.com";
 const password = "123456";
-
-const loginMutation = (e: string, p: string) => `
-mutation {
-  login(email: "${e}", password: "${p}") {
-    path
-    message
-  }
-}
-`
-
-const meQuery = `
-query {
-  me {
-    userId
-    email
-  }
-}
-`
 
 let userId = '';
 
@@ -44,28 +26,11 @@ afterAll(async () => {
 
 describe("Me", () => {
   test("Check if it works", async () => {
-    const response = await axios.post(
-      process.env.TEST_HOST as string,
-      {
-        query: loginMutation(email, password)
-      }, {
-        withCredentials: true
-      });
+    const requestManager = new RequestManager(process.env.TEST_HOST as string)
+    await requestManager.login(email, password)
+    const response1 = await requestManager.me()
 
-
-    const [cookieString] = response.headers['set-cookie'];
-
-    const response1 = await axios.post(
-      process.env.TEST_HOST as string,
-      {
-        query: meQuery
-      }, {
-        headers: {
-          Cookie: cookieString
-        }
-      });
-
-    expect(response1.data.data.me).toEqual({
+    expect(response1.data.me).toEqual({
       userId,
       email
     })
