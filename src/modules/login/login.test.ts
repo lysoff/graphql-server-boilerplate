@@ -4,7 +4,7 @@ import { User } from "../../entity/User";
 import { getConnection } from "typeorm";
 import { RequestManager } from "../../utils/RequestManager";
 
-const email = "bob@bob.com";
+const email = "bor@bob.com";
 const password = "123456";
 
 beforeAll(async () => {

@@ -27,6 +27,14 @@ query {
 }
 `;
 
+const logoutMutation = `
+mutation {
+  logout {
+    path
+    message
+  }
+}`
+
 
 export class RequestManager {
   private url: string = "";
@@ -69,6 +77,16 @@ export class RequestManager {
     const response = await rp.post(this.url, {
       body: {
         query: meQuery
+      },
+      ...this.options
+    });
+    return response;
+  }
+
+  public logout = async () => {
+    const response = await rp.post(this.url, {
+      body: {
+        query: logoutMutation
       },
       ...this.options
     });
