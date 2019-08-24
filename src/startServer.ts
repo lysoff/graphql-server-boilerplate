@@ -22,17 +22,29 @@ export const startServer = async () => {
   const RedisStore = connectRedis(session)
 
   server.express.use(session({
+    name: "qid",
     store: new RedisStore({
       client: redis as any
     }),
     resave: false,
     saveUninitialized: false,
-    secret: 'supersecret'
+    secret: 'supersecret',
+    cookie: {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+      maxAge: 1000 * 60 * 60 * 24 * 7 // 7 days
+    }
   }))
 
   server.express.get("/confirm/:id", confirmEmail);
 
-  const app = await server.start({ port: process.env.NODE_ENV === "test" ? 0 : 4000 });
+  const app = await server.start({
+    port: process.env.NODE_ENV === "test" ? 0 : 4000,
+    cors: {
+      credentials: true,
+      origin: process.env.NODE_ENV === "test" ? "*" : process.env.FRONTEND_HOST
+    }
+  });
 
   console.log('Server is running on localhost:4000');
   return app;

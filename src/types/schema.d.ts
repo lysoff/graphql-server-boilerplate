@@ -23,12 +23,19 @@ declare namespace GQL {
   interface IQuery {
     __typename: 'Query';
     bye2: string | null;
+    me: IUser | null;
     bye: string | null;
     hello: string;
   }
 
   interface IHelloOnQueryArguments {
     name?: string | null;
+  }
+
+  interface IUser {
+    __typename: 'User';
+    userId: string;
+    email: string;
   }
 
   interface IMutation {

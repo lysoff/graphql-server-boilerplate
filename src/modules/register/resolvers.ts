@@ -1,4 +1,3 @@
-import * as bcrypt from "bcryptjs";
 import { IResolvers } from "graphql-tools";
 import { User } from "../../entity/User";
 import { formatYupError } from "../../utils/formatYupError";
@@ -11,8 +10,8 @@ import {
   passwordIsTooLong
 } from "./errors";
 import * as yup from "yup";
-import { createConfirmLink } from "../../utils/createConfirmLink";
-import { sendEmail } from "../../utils/sendEmail";
+// import { createConfirmLink } from "../../utils/createConfirmLink";
+// import { sendEmail } from "../../utils/sendEmail";
 
 const validationSchema = yup.object().shape({
   email: yup
@@ -31,7 +30,7 @@ const resolvers: IResolvers = {
     bye: () => ''
   },
   Mutation: {
-    register: async (_: any, args: GQL.IRegisterOnMutationArguments, { redis, request }) => {
+    register: async (_: any, args: GQL.IRegisterOnMutationArguments) => {
       try {
         await validationSchema.validate(args, { abortEarly: false })
       } catch (err) {
@@ -48,17 +47,16 @@ const resolvers: IResolvers = {
         }]
       }
 
-      const hashedPassword = await bcrypt.hash(password, 10);
       const user = User.create({
         email,
-        password: hashedPassword
+        password
       });
       await user.save();
 
-      if (process.env.NODE_ENV !== "test") {
-        const link = await createConfirmLink(request.headers.host, user.id, redis)
-        await sendEmail(user.email, link);
-      }
+      // if (process.env.NODE_ENV !== "test") {
+      //   const link = await createConfirmLink(request.headers.host, user.id, redis)
+      //   await sendEmail(user.email, link);
+      // }
 
       return null;
     }
